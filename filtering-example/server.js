@@ -2,8 +2,7 @@
 var express     = require('express'),
     fs          = require('fs'),
     app         = express(),
-    // customers   = JSON.parse(fs.readFileSync('data/customers.json', 'utf-8')),
-    states      = JSON.parse(fs.readFileSync('data/states.json', 'utf-8')),
+     customers   = JSON.parse(fs.readFileSync('data/customers.json', 'utf-8')),
     inContainer = process.env.CONTAINER,
     inAzure = process.env.WEBSITE_RESOURCE_GROUP,
     port = process.env.PORT || 8080;
@@ -26,106 +25,44 @@ if (!inContainer) {
     console.log(__dirname);
 }
 
-// app.get('/api/customers/page/:skip/:top', (req, res) => {
-//     const topVal = req.params.top,
-//           skipVal = req.params.skip,
-//           skip = (isNaN(skipVal)) ? 0 : +skipVal;
-//     let top = (isNaN(topVal)) ? 10 : skip + (+topVal);
+app.get('/api/customers/page/:skip/:top', (req, res) => {
+    const topVal = req.params.top,
+          skipVal = req.params.skip,
+          skip = (isNaN(skipVal)) ? 0 : +skipVal;
+    let top = (isNaN(topVal)) ? 10 : skip + (+topVal);
 
-//     if (top > customers.length) {
-//         top = skip + (customers.length - skip);
-//     }
+    if (top > customers.length) {
+        top = skip + (customers.length - skip);
+    }
 
-//     console.log(`Skip: ${skip} Top: ${top}`);
+    console.log(`Skip: ${skip} Top: ${top}`);
 
-//     var pagedCustomers = customers.slice(skip, top);
-//     res.setHeader('X-InlineCount', customers.length);
-//     res.json(pagedCustomers);
-// });
-
-// app.get('/api/customers', (req, res) => {
-//     res.json(customers);
-// });
-
-// app.get('/api/customers/:id', (req, res) => {
-//     let customerId = +req.params.id;
-//     let selectedCustomer = null;
-//     for (let customer of customers) {
-//         if (customer.id === customerId) {
-//            // found customer to create one to send
-//            selectedCustomer = {};
-//            selectedCustomer = customer;
-//            break;
-//         }
-//     }
-//     res.json(selectedCustomer);
-// });
-
-// app.post('/api/customers', (req, res) => {
-//     let postedCustomer = req.body;
-//     let maxId = Math.max.apply(Math,customers.map((cust) => cust.id));
-//     postedCustomer.id = ++maxId;
-//     postedCustomer.gender = (postedCustomer.id % 2 === 0) ? 'female' : 'male';
-//     customers.push(postedCustomer);
-//     res.json(postedCustomer);
-// });
-
-// app.put('/api/customers/:id', (req, res) => {
-//     let putCustomer = req.body;
-//     let id = +req.params.id;
-//     let status = false;
-
-//     //Ensure state name is in sync with state abbreviation
-//     const filteredStates = states.filter((state) => state.abbreviation === putCustomer.state.abbreviation);
-//     if (filteredStates && filteredStates.length) {
-//         putCustomer.state.name = filteredStates[0].name;
-//         console.log('Updated putCustomer state to ' + putCustomer.state.name);
-//     }
-
-//     for (let i=0,len=customers.length;i<len;i++) {
-//         if (customers[i].id === id) {
-//             customers[i] = putCustomer;
-//             status = true;
-//             break;
-//         }
-//     }
-//     res.json({ status: status });
-// });
-
-// app.delete('/api/customers/:id', function(req, res) {
-//     let customerId = +req.params.id;
-//     for (let i=0,len=customers.length;i<len;i++) {
-//         if (customers[i].id === customerId) {
-//            customers.splice(i,1);
-//            break;
-//         }
-//     }
-//     res.json({ status: true });
-// });
-
-// app.get('/api/orders/:id', function(req, res) {
-//     let customerId = +req.params.id;
-//     for (let cust of customers) {
-//         if (cust.customerId === customerId) {
-//             return res.json(cust);
-//         }
-//     }
-//     res.json([]);
-// });
-
-app.get('/api/states', (req, res) => {
-    res.json(states);
+    var pagedCustomers = customers.slice(skip, top);
+    res.setHeader('X-InlineCount', customers.length);
+    res.json(pagedCustomers);
 });
 
-app.post('/api/auth/login', (req, res) => {
-    var userLogin = req.body;
-    //Add "real" auth here. Simulating it by returning a simple boolean.
-    res.json(true);
+app.get('/api/customers', (req, res) => {
+    res.json(customers);
 });
 
-app.post('/api/auth/logout', (req, res) => {
-    res.json(true);
+app.get('/api/customers/:id', (req, res) => {
+    let customerId = +req.params.id;
+    let selectedCustomer = null;
+    for (let customer of customers) {
+        if (customer.id === customerId) {
+           // found customer to create one to send
+           selectedCustomer = {};
+           selectedCustomer = customer;
+           break;
+        }
+    }
+    res.json(selectedCustomer);
 });
+
+
+
+
 
 if (!inContainer) {
     // redirect all others to the index (HTML5 history)
