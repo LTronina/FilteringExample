@@ -1,6 +1,6 @@
 #Angular "app"
-API from express
 filtering, paging, sorting
+small API on express side
 
 ## running
 
